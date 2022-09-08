@@ -5,6 +5,8 @@ function App() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [add, setAdd] = useState("");
+  const [edit, setEdit] = useState(false);
+  const [active, setActive] = useState(null);
 
   const [users, setUers] = useState([]);
   const addUser = (e) => {
@@ -14,10 +16,34 @@ function App() {
       email,
       add,
     };
-    setUers([...users, user]);
+    if (edit) {
+      // updateUser
+      let copy = users;
+      Object.assign(copy[active], user);
+      setUers([...copy]);
+      setEdit(false);
+      setActive(null);
+    } else {
+      // Add user
+      setUers([...users, user]);
+    }
     setName("");
     setEmail("");
     setAdd("");
+  };
+  const onEditClick = (index) => {
+    const user = users[index];
+    setName(user.name);
+    setEmail(user.email);
+    setAdd(user.add);
+    setActive(index);
+    setEdit(true);
+  };
+  const deleteUser = (user) => {
+    if (window.confirm("Are you sure want to delete")) {
+      let copy = users.filter((item) => item !== user);
+      setUers([...copy]);
+    }
   };
   return (
     <div className="App">
@@ -53,7 +79,9 @@ function App() {
                   onChange={(e) => setAdd(e.target.value)}
                 />
               </div>
-              <button className="btn btn-success form-control">Add</button>
+              <button className="btn btn-success form-control">
+                {edit ? "Update" : "Add"}{" "}
+              </button>
             </form>
           </div>
         </div>
@@ -69,17 +97,27 @@ function App() {
           </tr>
         </thead>
         <tbody>
-          {users.map((user) => {
+          {users.map((user, index) => {
             return (
               <tr>
                 <td>{user.name} </td>
                 <td>{user.email} </td>
                 <td>{user.add} </td>
                 <td>
-                  <button className="btn btn-info">Edit</button>
+                  <button
+                    className="btn btn-info"
+                    onClick={() => onEditClick(index)}
+                  >
+                    Edit
+                  </button>
                 </td>
                 <td>
-                  <button className="btn btn-danger">Delete</button>
+                  <button
+                    className="btn btn-danger"
+                    onClick={() => deleteUser(user)}
+                  >
+                    Delete
+                  </button>
                 </td>
               </tr>
             );
